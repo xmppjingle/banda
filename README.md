@@ -1,6 +1,8 @@
 # B-and-A
 
-Multi Purpose A/B Testing Backend Service entirely built on top of Redis Stack
+An open, real-time, scalable and redis based A/B Testing Backend Service.
+
+With flexible and very generic APIs it takes advantage of recent Redis Stack Graph, TimeSeries and JSON to provide a simple although functional alternative for massive scalable A/B testing services including weighted experiments, remote config, events, triggers, etc...
 
 * Experiments API - Scalable A/B Testing Experiments Service (supports weights and trigger based enroll)
 * Remote Config API - Scalable Remote Client Configuration Service with A/B Support (similar to Firebase)
