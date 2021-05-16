@@ -1,0 +1,24 @@
+{
+  "app_name": "B-and-A",
+  "description": "An open, real-time, scalable and redis based A/B Testing Backend Service",
+  "hidden": false,
+  "rank": 27,
+  "type": "Backend Micro Service",
+  "contributed_by": "Community",
+  "repo_url": "https://github.com/xmppjingle/banda",
+  "download_url": "https://github.com/xmppjingle/banda/archive/refs/heads/main.zip",
+  "hosted_url": "",
+  "quick_deploy": "false",
+  "deploy_buttons": [],
+  "language": ["Kotlin", "Spring", "lettuce"],
+  "redis_commands": ["SETEX"],
+  "redis_features": ["caching"],
+  "redis_modules": ["RediJSON", "RediSearch", "RedisTimeseries", "RedisGraph"],
+  "app_image_urls": [
+    "https://github.com/xmppjingle/banda/raw/main/thumb.png"
+  ],
+  "youtube_url": "",
+  "special_tags": ["Hackathon"],
+  "verticals": ["Mobile", "Analytics"],
+  "markdown": "https://github.com/xmppjingle/banda/raw/main/README.md"
+}
