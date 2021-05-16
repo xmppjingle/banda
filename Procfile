@@ -1,0 +1,1 @@
+web: java -jar ./bjmeliga-0.0.1-SNAPSHOT.jar
