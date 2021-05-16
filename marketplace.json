@@ -17,7 +17,7 @@
   "app_image_urls": [
     "https://github.com/xmppjingle/banda/raw/main/thumb.png"
   ],
-  "youtube_url": "",
+  "youtube_url": "https://youtu.be/BKadNQ0-sKs",
   "special_tags": ["Hackathon"],
   "verticals": ["Mobile", "Analytics"],
   "markdown": "https://github.com/xmppjingle/banda/raw/main/README.md"
