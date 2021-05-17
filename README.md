@@ -17,7 +17,7 @@ With flexible and very generic APIs it takes advantage of recent Redis Stack Gra
 docker run -p 8080:8080 -e BASE_URL -e PORT -e REDIS_URL com.xmppjingle/bjomeliga-docker-boot -ti
 ```
 
-## API Documentation
+## Complete API Documentation
 Swagger available at: http://localhost:8080/swagger-ui/#/
 
 ## Setting Up Redis Modules
@@ -224,7 +224,7 @@ Response:
 }
 ```
 
-# Drawer API - Simple Generic Key/Value Service
+# Drawer API - Generic Key/Value Service
 
 Flexible Property Storage
 
@@ -259,3 +259,60 @@ Response
     }
 }
 ```
+
+# Some Used Redis Queries
+
+Most of the Commands are implemented using Lettuce Redis Command Annotation 
+
+### Graph
+
+- enrollEmitterOnExperiment
+```shell
+GRAPH.QUERY experiments :cmd
+```
+
+- fetchParticipantsOnExperiment
+```shell
+GRAPH.QUERY MATCH  (u:User)-[:participants]->(:Exp {id: '$experimentId'}) RETURN COUNT(u.id)
+```
+
+- graphQuery
+```shell
+GRAPH.QUERY MERGE (:User {id: '$emitterId' })-[:participants]->(:Exp {id: '$experimentId' }
+```
+
+### TimeSeries
+
+- pushEvent
+```shell
+TS.ADD :id * :value RETENTION :retention LABELS category :category type :type :labels
+```
+
+### JSON
+
+- setObject
+```shell 
+JSON.SET :id . :json")
+ ```
+
+- getObject
+```shell 
+JSON.GET :id .")
+ ```
+
+- setPathValue
+```shell
+JSON.SET :id :path :value
+```
+
+- getPathValue
+```shell
+JSON.GET :id :path
+```
+
+### Core
+
+- HSET
+- HGET / HGETALL
+- HEXISTS
+- ...
