@@ -151,6 +151,29 @@ Response
 }
 ```
 
+# Event API
+
+Timeseries Event Indexing 
+
+## Push Event
+
+```
+curl --location --request POST 'localhost:8080/events' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "category": "generic",
+  "emitterId": "rickAstley",
+  "id": "Rickrolling",
+  "labels": {
+    "channel": "youtube",
+    "prankedBy": "steveTyler"
+  },
+  "retention": 900000,
+  "type": "prank",
+  "value": 100
+}'
+```
+
 # Summary API - Generic Summary Service
 
 Simple and Flexible Summary Service, capable of keeping and maintaining summaries of multiple types of applications.
