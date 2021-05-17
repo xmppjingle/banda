@@ -11,6 +11,11 @@ With flexible and very generic APIs it takes advantage of recent Redis Stack Gra
 * Summary API - Allow Incremental Computation of Scores/Summaries 
 * Drawer API - Generic Key/Value Property Service 
 
+Future Steps:
+* Machine Learning Based Experiment Result Analysis using RedisAI
+
+![Diagram](diagram.png)
+
 ## Docker Run Command
 
 ```
