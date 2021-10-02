@@ -26,10 +26,10 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     implementation("org.apache.commons:commons-math3:3.6.1")
-    implementation("org.apache.commons:commons-lang3:jar:3.12.0")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
 
-    implementation("io.lettuce:lettuce-core:6.1.1.RELEASE")
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("io.lettuce:lettuce-core:6.1.5.RELEASE")
+    implementation("com.google.code.gson:gson:2.8.8")
 
     implementation("com.squareup.okhttp3:okhttp:3.14.6")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
