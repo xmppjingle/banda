@@ -1,0 +1,10 @@
+choice1,user1,option_A,option_B,option_C
+choice2,user2,option_B,option_C
+choice3,user3,option_A,option_B
+choice4,user4,option_B,option_D,option_E
+choice5,user5,option_C,option_D
+choice6,user1,option_A,option_B,option_D
+choice7,user2,option_B,option_C,option_D
+choice8,user3,option_A,option_B,option_C
+choice9,user4,option_B,option_C,option_E
+choice10,user5,option_C,option_D,option_E
