@@ -93,21 +93,4 @@ class RecommendationService {
                     "MERGE (u)-[:WAS_SELECTED]->(o)"
         )
     }
-
-//    fun addChoiceEvent(choiceId: String, userId: String, selectedOption: String, options: Set<String>) {
-//        // Create nodes and relationships in Redis Graph
-//        var query = "CREATE (c:Choice {id: $choiceId}), (o:Option {id: $selectedOption}), (u:User {id: $userId})"
-////        CREATE (c:Choice {id: '$choiceId'})-[:HAS_OPTION]->(o:Option {id: '$selectedOption'}) """
-//////        CREATE (u:User {id: $userId})-[:MADE_CHOICE]->(c)
-////        CREATE (u)-[:SELECTED]->(o)
-////    """
-////        options.forEach { option ->
-////            query += """
-////            CREATE (c)-[:HAS_OPTION]->(:Option {id: $option})
-////        """
-////        }
-//        println(query)
-//        graphClient.query(graphId, query)
-//    }
-
 }
