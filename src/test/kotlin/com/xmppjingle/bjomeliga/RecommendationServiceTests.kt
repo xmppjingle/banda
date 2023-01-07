@@ -48,15 +48,22 @@ class RecommendationServiceTest {
         service.addUserTags("user2", setOf("tag1", "tag3"))
         service.addUserTags("user3", setOf("tag1", "tag4"))
 
-        service.addChoiceEventToRedisGraph("1", "user1", "1", setOf("1", "2"))
-        service.addChoiceEventToRedisGraph("1", "user2", "1", setOf("1", "3"))
-        service.addChoiceEventToRedisGraph("1", "user3", "3", setOf("1", "2", "3"))
-        service.addChoiceEventToRedisGraph("1", "user1", "2", setOf("1", "2"))
+        service.getUserTags("user1").forEach { println(it) }
+
+        assertEquals(3, service.getUsers().size)
+
+        service.addChoiceEvent("1", "user1", "1", setOf("1", "2"))
+        service.addChoiceEvent("1", "user2", "1", setOf("1", "3"))
+        service.addChoiceEvent("1", "user3", "3", setOf("1", "2", "3"))
+        service.addChoiceEvent("1", "user1", "2", setOf("1", "2"))
+
+        assertEquals(3, service.getOptions("1").size)
 
         // Test getLikelyChoice method
         val expectedResult = mapOf(
-            "1" to 0.75,
-            "2" to 0.25
+            "1" to 2L,
+            "2" to 2L,
+            "3" to 1L
         )
         assertEquals(expectedResult, service.getLikelyChoice("1", setOf("tag1", "tag2")))
     }

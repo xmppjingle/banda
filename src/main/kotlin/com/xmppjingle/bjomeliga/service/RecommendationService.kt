@@ -15,42 +15,46 @@ class RecommendationService {
         graphClient = RedisGraph("localhost", 6333)
     }
 
-    fun getLikelyChoice(choiceId: String, tags: Set<String>): Map<String, Double> {
+    fun getLikelyChoice(choiceId: String, tags: Set<String>): Map<String, Long> {
         val query = """
-        MATCH (c:Choice {id: '$choiceId'})-[:HAS_OPTION]->(o:Option)<-[:SELECTED]-(u:User)-[:HAS_TAG]->(t:Tag)
+        MATCH (c:Choice {id: '$choiceId'})-[:HAS_OPTION]->(o:Option)<-[:WAS_SELECTED]-(u:User)-[:HAS_TAG]->(t:Tag)
         WHERE t.id IN [${tags.joinToString(",") { "'$it'" }}]
         WITH o, COUNT(*) AS score
         RETURN o.id AS option, score AS likelihood
         ORDER BY score DESC
     """
         val result = graphClient.query(graphId, query)
-        return result.map { it.getValue("option") as String to it.getValue("likelihood") as Double }.toMap()
-    }
-
-
-    fun addChoiceEvent(choiceId: String, userId: String, selectedOption: String, options: Set<String>) {
-        // Create nodes and relationships in Redis Graph
-        graphClient.query(graphId,
-            "CREATE (c|Choice {id: '$choiceId'})-[|HAS_OPTION]->(o|Option {id: '$selectedOption'}) " +
-                    "CREATE (u|User {id: '$userId'})-[|MADE_CHOICE]->(c) " +
-                    "CREATE (u)-[|SELECTED]->(o) " +
-                    options.forEach { option ->
-                        graphClient.query(graphId, "CREATE (c)-[|HAS_OPTION]->(|Option {id: '$option'})")
-                    }
-        )
+        return result.map { it.getValue("option") as String to it.getValue("likelihood") as Long }.toMap()
     }
 
     fun addUserTags(userId: String, tags: Set<String>) {
         // Create nodes and relationships in Redis Graph
         tags.forEach{
             graphClient.query(graphId,
-                "MERGE (u:User {id: '$userId'})-[:HAS_TAG]->(t:Tag {id: '$it'})"
+                "MERGE (u:User {id: '$userId'}) MERGE (t:Tag {id: '$it'}) MERGE (u)-[:HAS_TAG]->(t)"
             )
         }
     }
 
+    fun getUserTags(userId: String): Set<String> {
+        val query = "MATCH (u:User {id: '$userId'})-[:HAS_TAG]->(t:Tag) RETURN t.id"
+        val result = graphClient.query(graphId, query)
+        return result.map{ it.getValue("t.id") as String }.toSet()
+    }
+
+    fun getUsers(): List<String> {
+        val query = "MATCH (u:User) RETURN u.id"
+        val result = graphClient.query(graphId, query)
+        return result.map { it.getValue("u.id") as String }
+    }
+
+    fun getOptions(choiceId: String): Set<String> {
+        val result = graphClient.query(graphId, "MATCH (c:Choice {id: '$choiceId'})-[:HAS_OPTION]->(o:Option) RETURN o.id")
+        return result.map { it.getValue("o.id") as String }.toSet()
+    }
+
     /* Add choice event to Redis Graph database */
-    fun addChoiceEventToRedisGraph(choiceId: String, userId: String, selectedOption: String, options: Set<String>){
+    fun addChoiceEvent(choiceId: String, userId: String, selectedOption: String, options: Set<String>){
         // Create choice node if it doesn't exist
         graphClient.query(
             graphId, "MERGE (c:Choice {id: '$choiceId'})"
