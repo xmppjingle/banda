@@ -44,20 +44,20 @@ class RecommendationServiceTest {
         val service = RecommendationService()
         service.init()
 
-        service.addUserTags("user1", setOf("tag1", "tag2"))
-        service.addUserTags("user2", setOf("tag1", "tag3"))
-        service.addUserTags("user3", setOf("tag1", "tag4"))
+        service.addUserTags(graphId,"user1", setOf("tag1", "tag2"))
+        service.addUserTags(graphId,"user2", setOf("tag1", "tag3"))
+        service.addUserTags(graphId,"user3", setOf("tag1", "tag4"))
 
-        service.getUserTags("user1").forEach { println(it) }
+        service.getUserTags(graphId,"user1").forEach { println(it) }
 
-        assertEquals(3, service.getUsers().size)
+        assertEquals(3, service.getUsers(graphId).size)
 
-        service.addChoiceEvent("1", "user1", "1", setOf("1", "2"))
-        service.addChoiceEvent("1", "user2", "1", setOf("1", "3"))
-        service.addChoiceEvent("1", "user3", "3", setOf("1", "2", "3"))
-        service.addChoiceEvent("1", "user1", "2", setOf("1", "2"))
+        service.addChoiceEvent(graphId,"1", "user1", "1", setOf("1", "2"))
+        service.addChoiceEvent(graphId,"1", "user2", "1", setOf("1", "3"))
+        service.addChoiceEvent(graphId,"1", "user3", "3", setOf("1", "2", "3"))
+        service.addChoiceEvent(graphId,"1", "user1", "2", setOf("1", "2"))
 
-        assertEquals(3, service.getOptions("1").size)
+        assertEquals(3, service.getOptions(graphId,"1").size)
 
         // Test getLikelyChoice method
         val expectedResult = mapOf(
@@ -65,7 +65,7 @@ class RecommendationServiceTest {
             "2" to 2L,
             "3" to 1L
         )
-        assertEquals(expectedResult, service.getLikelyChoice("1", setOf("tag1", "tag2")))
+        assertEquals(expectedResult, service.getLikelyChoice(graphId,"1", setOf("tag1", "tag2")))
     }
 
 }
