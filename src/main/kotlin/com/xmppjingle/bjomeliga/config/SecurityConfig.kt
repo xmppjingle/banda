@@ -1,5 +1,6 @@
 package com.xmppjingle.bjomeliga.config
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.stereotype.Component
 import springfox.documentation.builders.PathSelectors
 import springfox.documentation.builders.RequestHandlerSelectors
@@ -19,6 +21,9 @@ import springfox.documentation.spring.web.plugins.Docket
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Component
 internal class SecurityConfig : WebSecurityConfigurerAdapter() {
+
+    @Autowired
+    lateinit var apiKeyAuthFilter: ApiKeyAuthFilter
 
     @Throws(Exception::class)
     override fun configure(web: WebSecurity) {
@@ -41,8 +46,12 @@ internal class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Throws(java.lang.Exception::class)
     override fun configure(http: HttpSecurity) {
-        http.authorizeRequests()
+        http.addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .authorizeRequests()
+            // Whitelisted endpoints that do not require authentication
             .antMatchers(*AUTH_WHITELIST).permitAll()
+            // Endpoints that require authentication
+            .antMatchers("/**/*").authenticated()
             .antMatchers("/**/*").denyAll()
     }
 
