@@ -25,6 +25,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security:spring-security-data")
+    implementation("org.springframework:spring-aop")
+    implementation("org.aspectj:aspectjrt")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     implementation("org.apache.commons:commons-math3:3.6.1")
