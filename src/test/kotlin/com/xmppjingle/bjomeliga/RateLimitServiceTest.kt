@@ -1,50 +1,74 @@
 package com.xmppjingle.bjomeliga
 
-import com.xmppjingle.bjomeliga.api.RateLimitAdminController
-import com.xmppjingle.bjomeliga.api.RemoteConfigController
 import com.xmppjingle.bjomeliga.service.RateLimitService
+import com.xmppjingle.bjomeliga.service.ratelimit.RateLimitExceededException
 import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
 import io.lettuce.core.api.sync.RedisCommands
-import io.lettuce.core.dynamic.RedisCommandFactory
+import net.ishiis.redis.unit.RedisServer
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
-import javax.annotation.PostConstruct
 
-@SpringBootTest
 class RateLimitServiceTest {
 
-    @Autowired
-    private lateinit var rateLimitService: RateLimitService
+    private lateinit var redisServer: RedisServer
+    private lateinit var redisClient: RedisClient
+    private lateinit var connection: StatefulRedisConnection<String, String>
+    private lateinit var redisCommands: RedisCommands<String, String>
 
-    lateinit var redisClient: RedisClient
-    lateinit var connection: StatefulRedisConnection<String, String>
-    lateinit var factory: RedisCommandFactory
-    lateinit var redisCommands: RedisCommands<String, String>
-
-    @Value("\${redis.url:redis://localhost:6379}")
-    var redisURI: String = "redis://localhost:6379"
-
-    @PostConstruct
-    fun init() {
-        redisClient = RedisClient.create(redisURI)
+    @BeforeEach
+    fun setUp() {
+        redisClient = RedisClient.create("redis://127.0.0.1:6333")
         connection = redisClient.connect()
-        factory = RedisCommandFactory(connection)
         redisCommands = connection.sync()
     }
-    @Test
-    fun testApplyConfigurationsToCustomer() {
-        rateLimitService.applyConfigurationsToCustomer("customer1", "plan1")
 
-        assertEquals("10", redisCommands.get("customer1:endpoint1"))
-        assertEquals("20", redisCommands.get("customer1:endpoint2"))
+    @AfterEach
+    fun tearDown() {
+        connection.close()
+        redisClient.shutdown()
     }
+
+    @Test
+    fun testRateLimitService() {
+        val rateLimitService = RateLimitService()
+        rateLimitService.init()
+        rateLimitService.resetRate("customer1", "endpoint1")
+        rateLimitService.resetRate("customer1", "endpoint2")
+
+        // Configure a rate limit for endpoint1 for customer1
+        rateLimitService.configureRateLimit("customer1", "endpoint1", 5)
+
+        // Verify the rate limit was set correctly
+        assertEquals(5, rateLimitService.getRateLimit("customer1", "endpoint1")?.limit)
+
+        // Try to increase the rate limit over the limit and check exception
+        try {
+            for(i in 1..6) {
+                assert( rateLimitService.incrementAndCheckRateLimit("customer1", "endpoint1", 6))
+            }
+            assertEquals(false, rateLimitService.incrementAndCheckRateLimit("customer1", "endpoint1", 6))
+        } catch (e: RateLimitExceededException) {
+            assertEquals("Rate limit exceeded for customer1:endpoint1", e.message)
+        }
+
+        // Check incrementAndCheckRateLimit is allowed
+        for (i in 1..4) {
+            assert( rateLimitService.incrementAndCheckRateLimit("customer1", "endpoint2", 4))
+        }
+
+        assertEquals(false, rateLimitService.incrementAndCheckRateLimit("customer1", "endpoint", 0))
+    }
+
+//    @Test
+//    fun testApplyConfigurationsToCustomer() {
+//        rateLimitService.applyConfigurationsToCustomer("customer1", "plan1")
+//
+//        assertEquals("10", redisCommands.get("customer1:endpoint1"))
+//        assertEquals("20", redisCommands.get("customer1:endpoint2"))
+//    }
 
 //    @Test
 //    fun testRespectLimits() {

@@ -31,28 +31,20 @@ class RateLimiterAspect(private val rateLimitService: RateLimitService) {
         commands = connection.sync()
     }
 
-    @Around("@annotation(com.example.RateLimit)")
-    fun rateLimit(joinPoint: ProceedingJoinPoint): Any? {
+    @Around("@annotation(com.xmppjingle.bjomeliga.service.ratelimit.RateLimit)")
+    fun rateLimit(joinPoint: ProceedingJoinPoint): Any {
         val signature = joinPoint.signature as MethodSignature
         val method = signature.method
-        val rateLimit = method.getAnnotation(RateLimit::class.java)
+        //val rateLimitAnnotation = method.getAnnotation(RateLimit::class.java)
+        val customerId = joinPoint.args[0] as String
+        val endpoint = method.name
 
-        val customerId = joinPoint.args[0] as String // assuming that customerId is the first argument
-        val endpoint = rateLimit.value
-        val limit = rateLimitService.getRateLimit(customerId, endpoint)
-
-        if (limit == null) {
-            return joinPoint.proceed()
+        if (rateLimitService.incrementAndCheckRateLimit(customerId, endpoint)) {
+            throw RateLimitExceededException("Rate limit requests per hour exceeded for $customerId endpoint: $endpoint")
         }
-        val key = "$customerId:$endpoint"
-        val value = commands.decr(key)
-        if (value < 0) {
-            // rate limit exceeded, throw exception or return error response
-            throw RateLimitExceededException("Rate limit exceeded for $key")
-        }
-        // rate limit is not exceeded
         return joinPoint.proceed()
     }
+
 }
 
 class RateLimitExceededException(message: String) : Exception(message)

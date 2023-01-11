@@ -54,7 +54,7 @@ class RateLimitService() {
         val key = "$customerId:$endpoint"
         val limit = commands.get(key)
         return if(limit != null) {
-            RateLimit(endpoint, limit as Int)
+            RateLimit(endpoint, limit.toInt())
         } else {
             null
         }
@@ -70,6 +70,22 @@ class RateLimitService() {
             rateLimits.add(rateLimit)
         }
         return rateLimits
+    }
+
+    fun incrementAndCheckRateLimit(customerId: String, endpoint: String, requestsPerHour: Int): Boolean {
+        val key = "rate:$customerId:$endpoint"
+        val current = commands.incr(key)
+        commands.expire(key, 3600)
+        return current <= requestsPerHour
+    }
+
+    fun resetRate(customerId: String, endpoint: String) {
+        val key = "rate:$customerId:$endpoint"
+        commands.del(key)
+    }
+
+    fun incrementAndCheckRateLimit(customerId: String, endpoint: String): Boolean {
+        return incrementAndCheckRateLimit(customerId, endpoint, getRateLimit(customerId, endpoint)?.limit ?: 0)
     }
 
     fun applyConfigurationsToCustomer(customerId: String, plan: String) {
