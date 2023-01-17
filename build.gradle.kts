@@ -43,9 +43,6 @@ dependencies {
 
     implementation("com.redislabs:jredisgraph:2.5.1")
     implementation("io.projectreactor:reactor-core:3.4.0")
-    implementation("io.netty:netty-resolver-dns-native-macos:4.1.86.Final:osx-x86_64")
-    implementation("io.netty:netty-resolver-dns-native:4.1.86.Final:osx-x86_64")
-    implementation("io.netty:netty-transport-native-kqueue:4.1.86.Final:osx-x86_64")
 
     implementation(kotlin("reflect"))
 
