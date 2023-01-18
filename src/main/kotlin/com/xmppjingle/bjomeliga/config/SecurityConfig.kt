@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
@@ -22,8 +23,7 @@ import springfox.documentation.spring.web.plugins.Docket
 @Component
 internal class SecurityConfig : WebSecurityConfigurerAdapter() {
 
-    @Autowired
-    lateinit var apiKeyAuthFilter: ApiKeyAuthFilter
+    private lateinit var apiKeyAuthFilter: ApiKeyAuthFilter
 
     @Throws(Exception::class)
     override fun configure(web: WebSecurity) {
@@ -46,6 +46,7 @@ internal class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Throws(java.lang.Exception::class)
     override fun configure(http: HttpSecurity) {
+        apiKeyAuthFilter = ApiKeyAuthFilter(authenticationManager())
         http.addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
             .authorizeRequests()
             // Whitelisted endpoints that do not require authentication
@@ -62,5 +63,10 @@ internal class SecurityConfig : WebSecurityConfigurerAdapter() {
             .apis(RequestHandlerSelectors.any())
             .paths(PathSelectors.any())
             .build()
+    }
+
+    @Bean
+    override fun authenticationManagerBean(): AuthenticationManager {
+        return super.authenticationManagerBean()
     }
 }
